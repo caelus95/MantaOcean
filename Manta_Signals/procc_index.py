@@ -165,6 +165,9 @@ def linearRegress4Cube(sig,dataset,Slicing_date,method=1):
         p_values :
             
     '''
+    import pandas as pd
+    from tqdm import tqdm
+    import numpy as np
     from scipy import io
     import xarray as xr
     import statsmodels.api as sm
@@ -174,7 +177,7 @@ def linearRegress4Cube(sig,dataset,Slicing_date,method=1):
 
     if method :
         _,idx,idy = dataset.shape
-        Coef,Intercept = np.zeros([idx,idy]),np.zeros([idx,idy])
+        Coef,Intercept, p_values = np.zeros([idx,idy]),np.zeros([idx,idy]),np.zeros([idx,idy])
         for i in tqdm(range(idx)):
             for j in range(idy):
                 if np.isnan(dataset[:,i,j].mean()):
@@ -183,7 +186,7 @@ def linearRegress4Cube(sig,dataset,Slicing_date,method=1):
                     continue
                 
                 tmp_dataset_sig = dataset[:,i,j]
-                tmp_set = pd.DataFrame({'tmp_dataset_sig':tmp_dataset_sig,'sig':sig},index = sig.date)
+                tmp_set = pd.DataFrame({'tmp_dataset_sig':tmp_dataset_sig,'sig':sig},index = sig.index)
                 tmp = tmp_set.loc[Slicing_date[0]:Slicing_date[1]]
                 X, X_data = tmp.sig.values.reshape(-1,1), tmp.tmp_dataset_sig.values.reshape(-1,1)
          
