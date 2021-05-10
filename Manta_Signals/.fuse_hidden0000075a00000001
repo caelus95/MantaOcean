@@ -6,10 +6,10 @@ Created on Mon May 10 15:26:48 2021
 @author: caelus
 """
 
-# r_path = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/analysis_sigs/'
+r_path = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/analysis_sigs/'
 
 
-def sig_pro(r_path,ref_time,Standard=True,WY=2):
+def sig_pro(r_path1,ref_time,starnard=True,WY=2):
     '''
     r_path1 : str
     ref_time : list ex) ['1993-01-01',324,300]
@@ -72,15 +72,15 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
 
 
 
-# lonlat_path = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/data/qiu_2013/'
-# EKE_path = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/data/'
-# data_ = np.load(EKE_path+'EKE_10_30_120_250.npy')
-# dataset = data_[:]
-# tmp_lonlat = io.loadmat(lonlat_path+'eof.mat')
-# lon = tmp_lonlat['lon'][:].reshape(-1)
-# lat = tmp_lonlat['lat'][:].reshape(-1)
-# sig1 = Sig_set.first_5_2Y_Rm.values
-# Slicing_date = ['1993-01','2018-12']
+lonlat_path = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/data/qiu_2013/'
+EKE_path = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/data/'
+data_ = np.load(EKE_path+'EKE_10_30_120_250.npy')
+dataset = data_[:]
+tmp_lonlat = io.loadmat(lonlat_path+'eof.mat')
+lon = tmp_lonlat['lon'][:].reshape(-1)
+lat = tmp_lonlat['lat'][:].reshape(-1)
+sig1 = Sig_set.first_5_2Y_Rm.values
+Slicing_date = ['1993-01','2018-12']
 
 
 def Spatial_corr(dataset,sig,slicing_date):
@@ -118,8 +118,8 @@ def Spatial_corr(dataset,sig,slicing_date):
 
 
 
-# Sig_set1 = Sig_set.first_5_2Y_Rm
-# Sig_set2 = Sig_set.EKE_qiu_2Y_Rm
+Sig_set1 = Sig_set.first_5_2Y_Rm
+Sig_set2 = Sig_set.EKE_qiu_2Y_Rm
 
 
 def running_corr(sig1,sig2,WY=2):
