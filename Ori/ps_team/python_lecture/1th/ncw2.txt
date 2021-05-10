@@ -1,0 +1,70 @@
+
+def trans2nc(nc_savedir,time_array,ndepth,nlat,nlon,nssh,nu,nv,ntemp,nsal):
+
+    from netCDF4 import Dataset
+    from numpy import dtype
+
+    # open a netCDF file to write
+    name = f"{int(time_array[0]):02d}"+f"{int(time_array[1]):02d}"+f"{int(time_array[2]):02d}"
+    ncout = Dataset(nc_savedir+'HYCOM'+name+'.nc', 'w', format='NETCDF4')
+
+    # define axis size
+    #ncout.createDimension('time', None)  # unlimited
+    ncout.createDimension('depth', len(ndepth))
+    ncout.createDimension('lat', len(nlat) )
+    ncout.createDimension('lon', len(nlon) )
+
+    # create latitude axis
+    lat = ncout.createVariable('lat', dtype('double').char, ('lat'))
+    lat.standard_name = 'latitude'
+    lat.long_name = 'latitude'
+    lat.units = 'degrees'
+    lat.axis = 'Y'
+
+    # create longitude axis
+    lon = ncout.createVariable('lon', dtype('double').char, ('lon'))
+    lon.standard_name = 'longitude'
+    lon.long_name = 'longitude'
+    lon.units = 'degrees'
+    lon.axis = 'X'
+
+    # create variable array
+    sshout = ncout.createVariable('ssh', dtype('double').char, ('lat', 'lon'))
+    sshout.long_name = 'Surf_el'
+    sshout.units = 'm'
+    sshout.missing_value = np.nan
+
+    uout = ncout.createVariable('u', dtype('double').char, ('depth', 'lat', 'lon'))
+    uout.long_name = 'water_u'
+    uout.units = 'm/s'
+    uout.missing_value = np.nan
+
+    vout = ncout.createVariable('v', dtype('double').char, ('depth', 'lat', 'lon'))
+    vout.long_name = 'water_v'
+    vout.units = 'm/s'
+    vout.missing_value = np.nan
+
+    tempout = ncout.createVariable('temp', dtype('double').char, ('depth', 'lat', 'lon'))
+    tempout.long_name = 'water_temp'
+    tempout.units = 'C'
+    tempout.missing_value = np.nan
+
+    salout = ncout.createVariable('sal', dtype('double').char, ('depth', 'lat', 'lon'))
+    salout.long_name = 'water_sal'
+    salout.units = 'psu'
+    salout.missing_value = np.nan
+
+    # copy axis from original dataset
+    lon[:] = nlon[:]
+    lat[:] = nlat[:]
+
+    sshout[:] = nssh[:]
+    uout[:] = nu[:]
+    vout[:] = nv[:]
+    tempout[:] = ntemp[:]
+    salout[:] = sal[:]
+
+    # close files
+    ncout.close()
+
+    return

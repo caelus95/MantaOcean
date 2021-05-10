@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr  1 19:57:05 2021
+
+@author: caelus
+"""
+
+
+
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+import numpy as np
+import xarray as xr
+f_path3 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ugosa_225_25_123_124_M.nc'
+f_path4 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/vgosa_225_25_123_124_D.nc'
+# f_path3 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/EKE/ugosa_qiu_M.nc'
+# f_path4 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/EKE/vgosa_qiu_M.nc'
+
+# f_path5 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/Yan_Sun_Spatial_Mean/Sigs/bo_qiu_EKE_1.npy'
+# f_path6 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/Yan_Sun_Spatial_Mean/Sigs/bo_qiu_EKE_2.npy'
+
+# a = np.load(f_path5)
+# b = np.load(f_path6)
+
+plt.plot(t,a)
+# plt.plot(t,b)
+plt.plot(t,EKE_T*10000)
+# plt.plot(t,EKE_T1*10000)
+
+# ugos = xr.open_dataset(f_path1,decode_times=False)
+# vgos = xr.open_dataset(f_path2,decode_times=False)
+ugosa = xr.open_dataset(f_path3,decode_times=False)
+vgosa = xr.open_dataset(f_path4,decode_times=False)
+
+ugos_a = ugos.ugos - ugos.ugos.mean(dim='time')
+vgos_a = vgos.vgos - vgos.vgos.mean(dim='time')
+
+# EKE = (ugos_a**2 + vgos_a**2)/2
+# EKE_T =  EKE.mean(dim=('x','y'))
+
+EKE2 = (ugosa.ugosa**2 + vgosa.vgosa**2)/2
+EKE_T2 =  EKE2.mean(dim=('x','y'))
+
+t = pd.date_range("1993-1-1", periods=324,freq='1M')
+
+
+plt.plot(t,EKE_T2*10000)
+plt.plot(t,EKE_T1*10000)
+plt.plot(t,EKE_T*10000)
+plt.legend(1)
+
+# np.save('/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/EKE/EKE.npy',EKE_T)
+
+
+EKE1 = (ugos.ugos**2 + vgos.vgos**2)/2
+EKE_T1 =  EKE1.mean(dim=('x','y'))
+
+plt.plot(t,EKE_T*10000)
+plt.plot(t,EKE_T1*10000)
+
+
+
+np.save('/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/EKE/qiu_wang/EKE_225_25_123_124.npy',EKE2.values)
+np.save('/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/EKE/qiu_wang/lon_225_25_123_124.npy',EKE2.lon.values)
+np.save('/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/EKE/qiu_wang/lat_225_25_123_124.npy',EKE2.lat.values)
+
+
+ugos.ugos.values
+ugos_a.values
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

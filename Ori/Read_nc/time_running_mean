@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar 19 00:16:29 2021
+
+@author: caelus
+"""
+
+import numpy as np
+# import xarray as xr
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+import pandas as pd
+
+r_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/latest/sigs/first_5_ceemdan.npy'
+r_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/EKE/EKE_ceemd.npy'
+
+
+a = np.load(r_path1)
+b = np.load(r_path2)
+
+
+SIG2 = pd.DataFrame({'ori':a[:,4]},index = pd.date_range('1993-01-01', periods = 324,
+                                                  freq = 1 * '1m')) # .to_period()
+
+import pandas as pd
+
+pd_sig2 = pd.DataFrame(SIG2['ori'])
+
+R_m_sig2 = pd_sig2.rolling(window=12*3,center=True).mean()
+plt.plot(R_m_sig2)
+
+SIG2['R_m'] = R_m_sig2
+
+
+
+
+
+
+
+
+
+plt.plot(SIG.index,SIG.R_m.values*30)
+plt.plot(SIG.index,SIG2.R_m.values)
+
+
+SIG = pd.DataFrame({'ori':EKE_T},index = pd.date_range('1993-01-01', periods = 324,
+                                                  freq = 1 * '1m'))
+
+
+
+
+
+
+
+plt.rcParams["font.weight"] = "bold"
+plt.rcParams["axes.labelweight"] = "bold"
+plt.rcParams['axes.linewidth'] = 3
+# plt.rcParams['axes.grid'] = False
+plt.rcParams['xtick.labeltop'] = False
+plt.rcParams['xtick.labelbottom'] = True
+plt.rcParams['ytick.labelright'] = False
+plt.rcParams['ytick.labelleft'] = True
+plt.rcParams['font.size'] = 18
+plt.rcParams['lines.linewidth'] = 2
+
+
+plt.figure(figsize=(13,8))
+plt.plot(t,a[:,4]*100)
+plt.plot(t,b[:,4]/10)
+plt.legend(['Kuroshio(ceemdan)','EKE(ceemdan)'])
+
+C = np.zeros(324-12*3*2)
+n=0
+for i in range(324-12*3*2):
+    C[n]=np.corrcoef(a[i+12*3:i+12*3*2,4],b[i+12*3:i+12*3*2,4])[0][1]
+    n+=1
+
+
+t = pd.date_range("1993-1-1", periods=324,freq='1M')
+
+plt.plot(t[12*3:324-12*3],C)
+plt.plot(t,a[:,4]*500)
+plt.plot(t,b[:,4])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
