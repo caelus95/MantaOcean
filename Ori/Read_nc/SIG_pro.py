@@ -136,13 +136,13 @@ plt.plot(Sig_set_set['date'],Sig_set_set['EKE_qiu_ceemdan'])
 # =============================================================================
 # EKE qiu
 # =============================================================================
-
+date =  pd.date_range('1993-01-01', periods = 324,freq = 1 * '1m').strftime('%Y-%m')
 
 plt.figure(1,figsize=(16,10),dpi=80)
 ax = plt.gca()
 # plt.title('Yan Sun imf05',position=(0.5, 1.0+0.1),
 #           fontweight='bold',fontsize='48')
-plt.plot(date,Sig_set.EKE_qiu.values,color=[.7,.7,.7],linewidth=2,label='SSH Diff')
+# plt.plot(date,Sig_set.EKE_qiu.values,color=[.7,.7,.7],linewidth=2,label='SSH Diff')
 # plt.plot(date,Sig_set.cmd_eke.values,label='running mean',color='darkred',linewidth=2.5)
 plt.plot(date,Sig_set.EKE_qiu_eof.values,label='EOF pc1',color=[.85,.85,.85],linewidth=2.5)
 # plt.plot(date,Sig_set.stats_model.values,label='statsmodels',color='darkgreen',linewidth=2.5)
@@ -210,8 +210,8 @@ plt.gca().spines["right"].set_alpha(.0)
 plt.gca().spines["left"].set_alpha(.3)
 plt.legend(loc='upper right')
 plt.grid(axis='y', alpha=.3)
-if savefig:
-    plt.savefig(w_path+'EKE_qiu_normalized',dpi=150)
+# if savefig:
+#     plt.savefig(w_path+'EKE_qiu_normalized',dpi=150)
 plt.show()
 
 
@@ -227,26 +227,28 @@ ax = plt.gca()
 # plt.plot(date,Sig_set.stats_model.values,label='statsmodels',color='darkgreen',linewidth=2.5)
 # Draw Plot
 
-plt.plot(Sig_set.date,Sig_set.PDO_2Y_Rm, label='PDO (2Y Runing mean)',color=[.8,.8,.8],linewidth=2.5)
-plt.plot(Sig_set.date,Sig_set.EKE_qiu_2Y_Rm, label='eddy (2Y Runing mean)',color='darkred',linewidth=2.5)
+plt.plot(Sig_set.date,Sig_set.PDO_2Y_Rm, label='PDO (2Y Runing mean)',color='darkblue',linewidth=2.5,zorder=1)
+plt.plot(Sig_set.date,Sig_set.EKE_qiu_10_30_120_250_2Y_Rm, label='eddy (2Y Runing mean)',color='darkred',linewidth=2.5,zorder=2)
+plt.plot(Sig_set.date,Sig_set.WP_2Y_Rm, label='WP (2Y Runing mean)',color='g',linewidth=2.5,zorder=3)
+plt.plot(Sig_set.date,-Sig_set.WP_2Y_Rm, label='-WP (2Y Runing mean)',color=[.8,.8,.8],linewidth=2.5,zorder=4)
 
-plt.plot(Sig_set.date,Sig_set.ET_Speed_pc1_2Y_Rm, label='SSH Diff (2Y Runing mean)',color='k',linewidth=2.5)
+plt.plot(Sig_set.date,Sig_set.ADT_index_2Y_Rm, label='SSH Diff (2Y Runing mean)',color='k',linewidth=2.5,zorder=0)
 # plt.plot(Sig_set.date,Sig_set.first_5_2Y_Rm, label='EKE qiu (2Y Runing mean)',color='darkred',linewidth=2.5)
 
 # Decoration
 # plt.ylim(50,750)
 xtick_location = Sig_set.index.tolist()[::12*2]
 xtick_labels = Sig_set.date.tolist()[::12*2]
-plt.xticks(ticks=xtick_location, labels=xtick_labels, rotation=0, fontsize=12, alpha=.7)
+plt.xticks(ticks=xtick_location, labels=xtick_labels, rotation=30, fontsize=16, alpha=.7,fontweight='bold')
 # plt.title("Peak and Troughs of Air Passengers Traffic (1949 - 1969)", fontsize=22)
-plt.yticks(fontsize=12, alpha=.7)
+plt.yticks(fontsize=16, alpha=.7,fontweight='bold')
 # Lighten borders
 plt.gca().spines["top"].set_alpha(.0)
 plt.gca().spines["bottom"].set_alpha(.3)
 plt.gca().spines["right"].set_alpha(.0)
 plt.gca().spines["left"].set_alpha(.3)
 plt.legend(loc='upper right')
-plt.grid(axis='y', alpha=.3)
+plt.grid(axis='x', alpha=.3)
 # if savefig:
     # plt.savefig(w_path+'EKE_qiu_normalized',dpi=150)
 plt.show()

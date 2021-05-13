@@ -14,14 +14,14 @@ from netCDF4 import Dataset
 from tqdm import tqdm
 
 # Difine variables
-llcrnrlat = 17 # int  
-urcrnrlat = 22 # int
-llcrnrlon = 125 # int
+llcrnrlat = 8 # int  
+urcrnrlat = 30 # int
+llcrnrlon = 112 # int
 urcrnrlon = 180 # int
-var_name = 'ugosa' # str
+var_name = 'adt' # str
 r_path = '/home/caelus/dock_2/psi36/DATA/ncfile/CDS/nc/'# str
-w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_17_22_125_180_M.nc'
-w_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_17_22_125_180_D.nc'
+w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_8_30_112_180_M.nc'
+w_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_8_30_112_180_D.nc'
 
 dir_list = os.listdir(r_path)
 nc_list = np.sort([file for file in dir_list if file.endswith(".nc")])
