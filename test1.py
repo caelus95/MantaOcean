@@ -22,7 +22,7 @@ r_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/EKE/qiu_wang/'
 w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/fig2/'
 
 
-Sig_set,Corr_map = sig_pro(r_path1,['1993-01-01',324,300],Standard=True)
+Sig_set,Corr_map,Annual_mean = sig_pro(r_path1,['1993-01-01',324,300],Standard=True)
 
 # data, coor = nc2npy(r_path2)
 # time,lon,lat = coor[0],coor[1],coor[2]

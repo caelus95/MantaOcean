@@ -45,6 +45,11 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
     if Standard :
         Sig_sets = (Sig_sets -Sig_sets.mean())/(Sig_sets.std())
 
+
+    # Annual mean 
+    Sig_set['dates'] = pd.to_datetime(Sig_set.index)
+    Annual_mean = Sig_set.groupby(Sig_set.dates.dt.year).mean()
+
     # Creating RM (Dataframe)
     RM = Sig_sets.rolling(window=int(12*WY),center=True).mean()
     
@@ -63,8 +68,12 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
     Corr_Matrix = Sig_set[12:-12].corr()
 
     print('!!!!!!!!!!!!!!!!!!!\nCorrcoef --> 1994~\n!!!!!!!!!!!!!!!!!!!')
+    
 
-    return Sig_set, Corr_Matrix
+
+    
+    
+    return Sig_set, Corr_Matrix, Annual_mean
     
     # Sig_set['date'] =  pd.date_range('1993-01-01', periods = 324,freq = 1 * '1m').strftime('%Y-%m')
 
@@ -145,7 +154,7 @@ def running_corr(sig1,sig2,WY=2):
     for i in range(int(factor),len(sig1)-factor):
         # print(i)
         Corr_vector.append(np.corrcoef(sig1[i-factor:i+factor],sig2[i-factor:i+factor])[0,1])
-        print(Corr_vector[i-factor],Sig_set.date[i])
+        # print(Corr_vector[i-factor],sig1.date[i])
 
     return Corr_vector, Total_corr
 

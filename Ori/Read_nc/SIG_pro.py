@@ -74,7 +74,9 @@ Corr_Matrix = Sig_set[12:-12].corr()
 print('!!!!!!!!!!!!!!!!!!!\nCorrcoef --> 1994~\n!!!!!!!!!!!!!!!!!!!')
 
 
-Sig_set['date'] =  pd.date_range('1993-01-01', periods = 324,freq = 1 * '1m').strftime('%Y-%m')
+# Sig_set['date'] =  pd.date_range('1993-01-01', periods = 324,freq = 1 * '1m').strftime('%Y-%m')
+Sig_set['dates'] = pd.to_datetime(Sig_set.index)
+Annual_mean = Sig_set.groupby(Sig_set.dates.dt.year).mean()
 
 
 
