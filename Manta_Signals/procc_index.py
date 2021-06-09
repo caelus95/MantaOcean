@@ -38,7 +38,7 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
             print('ErroR!!!'*5)
             break
     
-  
+  # Sig_set
     # Sig_sets.rename(columns={'EKE_qiu_10_30_120_250':'EKE_qiu','EKE_qiu_10_30_120_250_ceemd_imf5':'EKE_qiu_ceemd_imf5',
     #                      'EKE_qiu_10_30_120_250_pc1':'EKE_qiu_pc1'},inplace=True)  
     
@@ -47,8 +47,8 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
 
 
     # Annual mean 
-    Sig_set['dates'] = pd.to_datetime(Sig_set.index)
-    Annual_mean = Sig_set.groupby(Sig_set.dates.dt.year).mean()
+    Sig_sets['dates'] = pd.to_datetime(Sig_sets.index)
+    Annual_mean = Sig_sets.groupby(Sig_sets.dates.dt.year).mean()
 
     # Creating RM (Dataframe)
     RM = Sig_sets.rolling(window=int(12*WY),center=True).mean()
@@ -62,10 +62,10 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
     
     # Appending name"_Rm"
 
-    Sig_set = pd.concat([Sig_sets,RM],axis=1)
+    Sig_sets = pd.concat([Sig_sets,RM],axis=1)
     
     # Corr Matrix
-    Corr_Matrix = Sig_set[12:-12].corr()
+    Corr_Matrix = Sig_sets[12:-12].corr()
 
     print('!!!!!!!!!!!!!!!!!!!\nCorrcoef --> 1994~\n!!!!!!!!!!!!!!!!!!!')
     
@@ -73,7 +73,7 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
 
     
     
-    return Sig_set, Corr_Matrix, Annual_mean
+    return Sig_sets, Corr_Matrix, Annual_mean
     
     # Sig_set['date'] =  pd.date_range('1993-01-01', periods = 324,freq = 1 * '1m').strftime('%Y-%m')
 
@@ -184,32 +184,33 @@ def linearRegress4Cube(sig,dataset,Slicing_date,method=1):
     # from sklearn.datasets import fetch_20newsgroups_vectorized
     # from sklearn.feature_selection import chi2
 
-    if method :
-        _,idx,idy = dataset.shape
-        Coef,Intercept, p_values = np.zeros([idx,idy]),np.zeros([idx,idy]),np.zeros([idx,idy])
-        for i in tqdm(range(idx)):
-            for j in range(idy):
-                if np.isnan(dataset[:,i,j].mean()):
-                    Coef[i,j] = np.nan
-                    Intercept[i,j] = np.nan
-                    continue
-                
-                tmp_dataset_sig = dataset[:,i,j]
-                tmp_set = pd.DataFrame({'tmp_dataset_sig':tmp_dataset_sig,'sig':sig},index = sig.index)
-                tmp = tmp_set.loc[Slicing_date[0]:Slicing_date[1]]
-                X, X_data = tmp.sig.values.reshape(-1,1), tmp.tmp_dataset_sig.values.reshape(-1,1)
-         
-                if method == 'sm' :
-                    mod = sm.OLS(X,X_data)
-                    fii = mod.fit()
-                    Coef[i,j] = fii.summary2().tables[1]['Coef.'].x1        # print(line_fitter.coef_[1])
-                    p_values[i,j] = fii.summary2().tables[1]['P>|t|']
-                
-                elif method :
-                    line_fitter = LinearRegression()
-                    line_fitter.fit(X,X_data)
-                    Coef[i,j] = line_fitter.coef_
-                    Intercept[i,j] = line_fitter.intercept_
+
+    _,idx,idy = dataset.shape
+    Coef,Intercept, p_values = np.zeros([idx,idy]),np.zeros([idx,idy]),np.zeros([idx,idy])
+    for i in tqdm(range(idx)):
+        for j in range(idy):
+            if np.isnan(dataset[:,i,j].mean()):
+                # print('dsadsadsadsadsadas')
+                Coef[i,j] = np.nan
+                Intercept[i,j] = np.nan
+                continue
+
+            tmp_dataset_sig = dataset[:,i,j]
+            tmp_set = pd.DataFrame({'tmp_dataset_sig':tmp_dataset_sig,'sig':sig},index = sig.index)
+            tmp = tmp_set.loc[Slicing_date[0]:Slicing_date[1]]
+            X, X_data = tmp.sig.values.reshape(-1,1), tmp.tmp_dataset_sig.values.reshape(-1,1)
+     
+            if method == 'sm' :
+                mod = sm.OLS(X_data,X)
+                fii = mod.fit()
+                Coef[i,j] = fii.summary2().tables[1]['Coef.'].x1        # print(line_fitter.coef_[1])
+                p_values[i,j] = fii.summary2().tables[1]['P>|t|']
+            
+            else:
+                line_fitter = LinearRegression()
+                line_fitter.fit(X,X_data)
+                Coef[i,j] = line_fitter.coef_
+                Intercept[i,j] = line_fitter.intercept_
                 
     return Coef, p_values
 

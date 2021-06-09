@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jun  5 18:57:05 2021
-
-@author: caelus
-"""
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
 Created on Sat Jun  5 15:43:17 2021
 
 @author: caelus
@@ -54,9 +46,25 @@ dask.config.set({"array.slicing.split_large_chunks": True})
 
 Slice_lat, Slice_lon = [-10, 70], [112,260]
 
-data_s = data_Mm.loc[dict(lon=slice(Slice_lon[0],Slice_lon[1]),lat=slice(Slice_lat[0],Slice_lat[1]))]
+data_s_1 = data_Mm.loc[dict(lon=slice(Slice_lon[0],Slice_lon[1]),lat=slice(Slice_lat[0],Slice_lat[1]))]
+data_s_2 = data_Mm.loc[dict(lon=slice(Slice_lon[0]-360,Slice_lon[1]-360),lat=slice(Slice_lat[0],Slice_lat[1]))]
 
-data_s.to_netcdf(w_path1+'GRSST_Mm_'+tmp_name+'_10_70_112_260.nc',mode='w')
+data_s_2 = data_s_2.assign_coords(lon=( (data_s_2.lon + 360)  ))
+data = xr.concat([data_s_1, data_s_2], dim="lon")
+
+analysed_sst = data.analysed_sst.values
+np.save(w_path1+'analysed_sst',analysed_sst_Mm)
+
+uncertainty = data.analysis_uncertainty.values
+mask = data.mask.values
+
+'''
+for i in tqdm(data.time.values):
+    tmp_data = data.loc[dict(time=slice(i))].squeeze()
+    tmp_name = str(i)[:7]
+
+    tmp_data.to_netcdf(w_path1+'GRSST_Mm_'+tmp_name+'_10_70_112_260.nc')
+'''
 
 # =============================================================================
 # 
