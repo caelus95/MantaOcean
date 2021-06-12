@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jun 11 15:22:00 2021
+Created on Thu Jun 10 16:20:38 2021
 
 @author: caelus
 """
-
 PKG_path = '/home/caelus/dock_1/Working_hub/LGnDC_dep/python_cent/MantaPKG/'
 import sys 
 sys.path.append(PKG_path)

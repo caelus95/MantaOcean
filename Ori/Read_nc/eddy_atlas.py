@@ -8,14 +8,14 @@ Created on Thu Nov 26 18:58:53 2020
 
 
 from netCDF4 import Dataset
-r_path ='/home/shamu/HUB/eddy_trajectory_2.0exp_19930101_20191015.nc'
+r_path ='/home/caelus/dock_1/Working_hub/DATA_dep/MesoscaleEddy/eddy_trajectory_2.0exp_19930101_20191015.nc'
 A = Dataset(r_path)
 
 
 import xarray as xr
 import numpy as np
 # Load dataset with xarray
-r_path = '/home/shamu/mangrove2/psi36/DATA/ncfile/MesoscaleEddy/eddy_trajectory_2.0exp_19930101_20191015.nc'
+# r_path = '/home/caelus/dock_1/psi36/DATA/ncfile/MesoscaleEddy/eddy_trajectory_2.0exp_19930101_20191015.nc'
 with xr.open_dataset(r_path, decode_cf=False)  as h:
  
     lon_min, lon_max, lat_min, lat_max =1,5, -28, -27
@@ -44,7 +44,7 @@ plt.show()
 import xarray as xr
 import numpy as np
 # Load dataset with xarray
-r_path = '/home/shamu/mangrove2/psi36/DATA/ncfile/MesoscaleEddy/eddy_trajectory_2.0exp_19930101_20191015.nc'
+# r_path = '/home/shamu/mangrove2/psi36/DATA/ncfile/MesoscaleEddy/eddy_trajectory_2.0exp_19930101_20191015.nc'
 Data = xr.open_dataset(r_path, decode_cf=False)
 
 

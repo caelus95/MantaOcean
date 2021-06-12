@@ -23,7 +23,7 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
         
     Sig_set_list = np.sort([file for file in os.listdir(r_path) if file.endswith(".npy")])
     
-    Sig_sets = pd.DataFrame({},index = pd.date_range(ref_time[0], periods = ref_time[1],freq = 1 * '1m'))
+    Sig_sets = pd.DataFrame({},index = pd.date_range(ref_time[0], periods = ref_time[1],freq = 1 * '1m').strftime('%Y-%m'))
     
     for i in Sig_set_list:
         tmp = np.load(r_path+i).reshape(-1)

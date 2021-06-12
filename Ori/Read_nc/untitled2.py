@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jun  5 18:57:05 2021
+Created on Thu Jun 10 16:20:38 2021
 
 @author: caelus
 """
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jun  5 15:43:17 2021
-
-@author: caelus
-"""
-
 PKG_path = '/home/caelus/dock_1/Working_hub/LGnDC_dep/python_cent/MantaPKG/'
 import sys 
 sys.path.append(PKG_path)
@@ -28,88 +19,61 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import dask
-
-# =============================================================================
-# Load data (Pararell)
-# =============================================================================
-
-r_path1 = '/home/caelus/dock_2/psi36/DATA/ncfile/GRSST/nc_files/'
-# r_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/analysis_sigs/'
-
-w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/task_GRSST/nc/'
-
-nc_list = np.sort([file for file in os.listdir(r_path1) if file.endswith(".nc")])
-
-data = xr.open_mfdataset(r_path1+'*.nc', parallel=True)
-
-Sample_Data1 = xr.open_dataset(r_path1+nc_list[0])
-
-data_Mm = data.resample(time="1MS").mean(dim="time")
-
-del data
-
-dask.config.set({"array.slicing.split_large_chunks": True})
-
-
-Slice_lat, Slice_lon = [-10, 70], [112,260]
-
-data_s = data_Mm.loc[dict(lon=slice(Slice_lon[0],Slice_lon[1]),lat=slice(Slice_lat[0],Slice_lat[1]))]
-
-data_s.to_netcdf(w_path1+'GRSST_Mm_'+tmp_name+'_10_70_112_260.nc',mode='w')
-
-# =============================================================================
-# 
-# =============================================================================
 
 
 
+# define a function to compute a linear trend of a timeseries
+def linear_trend(x):
+    pf = np.polyfit(x.time, x, 1)
+    # need to return an xr.DataArray for groupby
+    return xr.DataArray(pf[0])
+
+
+data = xr.open_dataset('/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/adt_0_60_112_260_M.nc',decode_times=True)
+
+Time = ['1993-01','2019-12'] 
+
+data_s = data.loc[dict(time=slice(Time[0],Time[1]))]
+
+data_s = data_s.assign_coords(time=np.arange(len(data_s.time.values)))
+
+
+lon,lat = data.adt.lon, data.adt.lat
+
+
+# stack lat and lon into a single dimension called allpoints
+stacked = data_s.adt.stack(allpoints=['y','x'])
+# apply the function over allpoints to calculate the trend at each point
+trend = stacked.groupby('allpoints').apply(linear_trend)
+# unstack back to lat lon coordinates
+trend_unstacked = trend.unstack('allpoints')
 
 
 
-
-
-
-
-
-
-
-
-
-# data_s = data.where( (data.lat>=minlat)&(data.lat<=maxlat)&(data.lon>=minlon)&(data.lon<=maxlon),
-#                     drop=True)
-# data_s = data.loc[dict(latitude=slice(maxlat,minlat),
-#                        longitude=slice(minlon,maxlon),expver=1 )]
-
-
-data_s = data_s.where(data_s.lsm==0,drop=False)
-
-data_M = data_s.mean(dim='time')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+plt.figure(figsize=(26, 5))
+ax = plt.gca()
+m = Basemap(projection='cyl',llcrnrlat=lat[0],urcrnrlat=lat[-1],\
+            llcrnrlon=lon[0],urcrnrlon=lon[-1],resolution='i')
+lon2, lat2 = np.meshgrid(lon,lat)
+x, y = m(lon, lat)
+m.fillcontinents(color='black',lake_color='black')
+m.drawcoastlines()
+m.drawparallels(np.arange(5.,33.,5.),labels=[True,False,False,False],
+                dashes=[2,2],fontsize=18,fontweight='bold',color='grey')
+m.drawmeridians(np.arange(-180.,181.,10.),labels=[False,False,False,True],
+                dashes=[2,2],fontsize=18,fontweight='bold',color='grey')
+plt.title('Trend'+str(Time[0])+'~'+str(Time[1]), fontproperties='', position=(0.5, 1.0+0.07), fontsize=34,fontweight='bold')
+# plt.suptitle(' UV & speed ',fontstyle='italic',position=(0.5, .92),fontsize=20)
+cs = m.pcolormesh(x,y,trend_unstacked,cmap=plt.cm.get_cmap('seismic'),shading='gouraud')
+plt.clim(-.001,.001)
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="2.5%", pad=0.1)
+cax.tick_params(labelsize=15)
+cax.set_ylabel('',{'fontsize':20,'fontweight':'bold','style':'italic'})
+#label 
+h = plt.colorbar(label='',cax=cax);
+# plt.savefig('F:/psi36/DATA/temp_var3/meanflow',bbox_inches='tight')
+plt.show()
 
 
 

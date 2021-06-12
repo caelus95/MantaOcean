@@ -136,8 +136,8 @@ cax = divider.append_axes("right", size="2.5%", pad=0.1)
 cax.tick_params(labelsize=15)
 cax.set_ylabel('',{'fontsize':20,'fontweight':'bold','style':'italic'})
 #label 
-h = plt.colorbar(label='',cax=cax);
-h = plt.colorbar(label='$\mathit{-10m}$',cax=cax);
+h = plt.colorbar(label='',cax=cax)
+h = plt.colorbar(label='$\mathit{-10m}$',cax=cax)
 # plt.savefig(w_path01+'Climatology_WSC_Press',bbox_inches='tight')
 plt.tight_layout()
 plt.show()
