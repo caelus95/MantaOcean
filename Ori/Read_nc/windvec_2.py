@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jun 14 18:02:07 2021
+Created on Mon Jun 14 15:45:34 2021
 
 @author: caelus
 """
-
 
 
 
@@ -139,47 +138,21 @@ factor = [4, 4]
 r_x, r_y, r_data1, r_data2 = r_vector4cube(x,y,data1,data2,[6,6])
 
 
-# ADT
-r_path3 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'
-ADT = xr.open_dataset(r_path3+'adt_0_60_112_260_M.nc')
-
-minlon,maxlon = 112,160
-minlat,maxlat = 5,45,
-    
-
-ADT_s = ADT.loc[dict(time=slice(Time[0],Time[1]),y=slice(minlat,maxlat),
-                        x=slice(minlon,maxlon))]
-
-ADT_s_a = ADT_s - ADT_s.mean(dim='time')
-
-ADT_s_a = ADT_s_a.fillna(-999)
-
-WD = 2*12
-data_adt_a_2Y = ADT_s_a.rolling(time=WD,center=True).mean().dropna("time")
-data_adt_a_2Y = data_adt_a_2Y.where(data_adt_a_2Y!=-999,drop=False) 
-
-
 
 # test plot for WSC, msl, UV
 
 lat11, lon11 = np.flipud(data_WSC_a_2Y.latitude.values), data_WSC_a_2Y.longitude.values 
 lat12, lon12 = np.flipud(r_y), r_x
-lat13, lon13 = data_adt_a_2Y.lat.values, data_adt_a_2Y.lon.values
-
 
 lon_m11, lat_m11 = np.meshgrid(lon11,lat11)
 lon_m12, lat_m12 = np.meshgrid(lon12,lat12)
-lon_m13, lat_m13 = np.meshgrid(lon13,lat13)
  
-
-
 # Cube data [t, at, on] (flipud needed)
 figdata111 = data_WSC_a_2Y.msl.values/100 
 figdata112 = data_WSC_a_2Y.curlZ.values
 
 figdata121 = r_data1.values
 figdata122 = r_data2.values
-figdata131 = data_adt_a_2Y.adt.values
 
 # ------------ test fig WSC ----------------
 
@@ -203,7 +176,7 @@ m.drawmeridians(np.arange(-180.,181.,20.),labels=[False,False,False,True],
 # plt.clim(-3.3,3.3)
 # plt.clabel(cs1,fontsize=10,fmt='%1.1f',colors='k')
 
-cs2 = m.pcolormesh(lon_m13,lat_m13,figdata131[n-12,:,:]*10,cmap=plt.cm.get_cmap('seismic'),shading='gouraud')
+cs2 = m.pcolormesh(lon_m11,lat_m11,np.flipud(figdata112[tmp_n,:,:])*10**7,cmap=plt.cm.get_cmap('seismic'),shading='gouraud')
 plt.clim(-.3,.3) # plt.clim(-max_figdata02,max_figdata02)
 
 # m.quiver(lon_m12,lat_m12,np.flipud(figdata121[tmp_n,:,:]),np.flipud(figdata122[tmp_n,:,:]),
@@ -220,7 +193,8 @@ cax = divider.append_axes("right", size="2.5%", pad=0.1)
 cax.tick_params(labelsize=15)
 cax.set_ylabel('',{'fontsize':20,'fontweight':'bold','style':'italic'})
 #label 
-h = plt.colorbar(label='10 [factor]',cax=cax);
+h = plt.colorbar(label='',cax=cax);
+h = plt.colorbar(label='$\mathit{10^{-7} N \cdot m^{-3}}$',cax=cax);
 # plt.savefig(w_path01+'Climatology_WSC_Press',bbox_inches='tight')
 plt.tight_layout()
 plt.show()
@@ -261,7 +235,7 @@ while n < 312:
     # plt.clim(-3.3,3.3)
     # plt.clabel(cs1,fontsize=10,fmt='%1.1f',colors='k')
 
-    cs2 = m.pcolormesh(lon_m13,lat_m13,figdata131[n-12,:,:]*10,cmap=plt.cm.get_cmap('seismic'),shading='gouraud')
+    cs2 = m.pcolormesh(lon_m11,lat_m11,np.flipud(figdata112[n-12,:,:])*10**7,cmap=plt.cm.get_cmap('seismic'),shading='gouraud')
     plt.clim(-.3,.3) # plt.clim(-max_figdata02,max_figdata02)
     
     q = m.quiver(lon_m12,lat_m12,np.flipud(figdata121[n-12,:,:]),np.flipud(figdata122[n-12,:,:]),
@@ -279,58 +253,58 @@ while n < 312:
     cax.set_ylabel('',{'fontsize':20,'fontweight':'bold','style':'italic'})
     #label 
     # h = plt.colorbar(label='',cax=cax);
-    h = plt.colorbar(label='10 [factor]',cax=cax);
+    h = plt.colorbar(label='$\mathit{10^{-7} N \cdot m^{-3}}$',cax=cax);
     # plt.savefig(w_path01+'Climatology_WSC_Press',bbox_inches='tight')
     plt.tight_layout()
-    # plt.savefig(w_path_sig+'/wNP_1/ADTa_UVa_'+Sig_set.dates[n])
+    plt.savefig(w_path_sig+'/wNP_1/WCSa_UVa_'+Sig_set.dates[n])
+    plt.show()
+
+# -----------------------------
+n = 12
+while n < 312:  
+    fig, ax = plt.subplots(figsize=(13,9.5),linewidth=1)
+    ax = plt.gca()
+    m = Basemap(projection='cyl',llcrnrlat=minlat,urcrnrlat=maxlat,\
+                llcrnrlon=minlon,urcrnrlon=maxlon,resolution='i')
+    # lon_m, lat_m = np.meshgrid(lon_00,lat_00)
+    # x, y = m(lon, lat)
+    m.fillcontinents(color='black',lake_color='black')
+    m.drawcoastlines()
+    m.drawparallels(np.arange(-80.,81.,10.),labels=[True,False,False,False],
+                    dashes=[2,2],fontsize=22,fontweight='bold',color='grey')
+    m.drawmeridians(np.arange(-180.,181.,10.),labels=[False,False,False,True],
+                    dashes=[2,2],fontsize=22,fontweight='bold',color='grey')
+    plt.title('a) Date : '+Sig_set.dates[n] + ' (WSCa & Pressa 2Y filtered)', fontproperties='',loc='left',pad=15,fontsize=28,fontweight='regular')
+    #plt.suptitle(' UV (mean flow) & speed (anomaly) ',fontstyle='italic',position=(0.5, .92),fontsize=20)
+    cs1 = m.contour(lon_m11,lat_m11,np.flipud(figdata111[n-12,:,:]),colors='k',
+                    linewidths=2.5,levels=15,alpha=.5)
+    plt.clim(-3.3,3.3)
+    plt.clabel(cs1,fontsize=10,fmt='%1.2f',colors='k')
+
+    cs2 = m.pcolormesh(lon_m11,lat_m11,np.flipud(figdata112[n-12,:,:])*10**7,cmap=plt.cm.get_cmap('seismic'),shading='gouraud')
+    plt.clim(-.3,.3) # plt.clim(-max_figdata02,max_figdata02)
+    
+    # q = m.quiver(lon_m12,lat_m12,np.flipud(figdata121[n-12,:,:]),np.flipud(figdata122[n-12,:,:]),
+    #      scale=5,headwidth=7.5,headaxislength=10,headlength=13,color='k',
+    #      minlength=1,edgecolor='y',minshaft=1.3,alpha=.7)
+    # plt.axis('equal')
+    # # Unit vector
+    # p = plt.quiverkey(q,115,44,.5,"0.5 m/s",coordinates='data',color='r',
+    #                   labelpos='S',alpha=1,labelcolor='w',fontproperties={'size':16},
+    #                   labelsep=0.13)
+    
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="2.5%", pad=0.1)
+    cax.tick_params(labelsize=15)
+    cax.set_ylabel('',{'fontsize':20,'fontweight':'bold','style':'italic'})
+    #label 
+    # h = plt.colorbar(label='',cax=cax);
+    h = plt.colorbar(label='$\mathit{10^{-7} N \cdot m^{-3}}$',cax=cax);
+    # plt.savefig(w_path01+'Climatology_WSC_Press',bbox_inches='tight')
+    plt.tight_layout()
+    plt.savefig(w_path_sig+'/wNP_3/WCSa_Pressa_'+Sig_set.dates[n],tight_layout=True)
     plt.show()
     n+=1
-# -----------------------------
-# n = 12
-# while n < 312:  
-#     fig, ax = plt.subplots(figsize=(13,9.5),linewidth=1)
-#     ax = plt.gca()
-#     m = Basemap(projection='cyl',llcrnrlat=minlat,urcrnrlat=maxlat,\
-#                 llcrnrlon=minlon,urcrnrlon=maxlon,resolution='i')
-#     # lon_m, lat_m = np.meshgrid(lon_00,lat_00)
-#     # x, y = m(lon, lat)
-#     m.fillcontinents(color='black',lake_color='black')
-#     m.drawcoastlines()
-#     m.drawparallels(np.arange(-80.,81.,10.),labels=[True,False,False,False],
-#                     dashes=[2,2],fontsize=22,fontweight='bold',color='grey')
-#     m.drawmeridians(np.arange(-180.,181.,10.),labels=[False,False,False,True],
-#                     dashes=[2,2],fontsize=22,fontweight='bold',color='grey')
-#     plt.title('a) Date : '+Sig_set.dates[n] + ' (WSCa & Pressa 2Y filtered)', fontproperties='',loc='left',pad=15,fontsize=28,fontweight='regular')
-#     #plt.suptitle(' UV (mean flow) & speed (anomaly) ',fontstyle='italic',position=(0.5, .92),fontsize=20)
-#     cs1 = m.contour(lon_m11,lat_m11,np.flipud(figdata111[n-12,:,:]),colors='k',
-#                     linewidths=2.5,levels=15,alpha=.5)
-#     plt.clim(-3.3,3.3)
-#     plt.clabel(cs1,fontsize=10,fmt='%1.2f',colors='k')
-
-#     cs2 = m.pcolormesh(lon_m11,lat_m11,np.flipud(figdata112[n-12,:,:])*10**7,cmap=plt.cm.get_cmap('seismic'),shading='gouraud')
-#     plt.clim(-.3,.3) # plt.clim(-max_figdata02,max_figdata02)
-    
-#     # q = m.quiver(lon_m12,lat_m12,np.flipud(figdata121[n-12,:,:]),np.flipud(figdata122[n-12,:,:]),
-#     #      scale=5,headwidth=7.5,headaxislength=10,headlength=13,color='k',
-#     #      minlength=1,edgecolor='y',minshaft=1.3,alpha=.7)
-#     # plt.axis('equal')
-#     # # Unit vector
-#     # p = plt.quiverkey(q,115,44,.5,"0.5 m/s",coordinates='data',color='r',
-#     #                   labelpos='S',alpha=1,labelcolor='w',fontproperties={'size':16},
-#     #                   labelsep=0.13)
-    
-#     divider = make_axes_locatable(ax)
-#     cax = divider.append_axes("right", size="2.5%", pad=0.1)
-#     cax.tick_params(labelsize=15)
-#     cax.set_ylabel('',{'fontsize':20,'fontweight':'bold','style':'italic'})
-#     #label 
-#     # h = plt.colorbar(label='',cax=cax);
-#     h = plt.colorbar(label='$\mathit{10^{-7} N \cdot m^{-3}}$',cax=cax);
-#     # plt.savefig(w_path01+'Climatology_WSC_Press',bbox_inches='tight')
-#     plt.tight_layout()
-#     plt.savefig(w_path_sig+'/wNP_3/WCSa_Pressa_'+Sig_set.dates[n],tight_layout=True)
-#     plt.show()
-#     n+=1
 
 
 

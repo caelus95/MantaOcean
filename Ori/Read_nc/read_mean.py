@@ -15,13 +15,13 @@ from tqdm import tqdm
 
 # Difine variables
 llcrnrlat = -10 # int  
-urcrnrlat = 42 # int
+urcrnrlat = 70 # int
 llcrnrlon = 112 # int
-urcrnrlon = 140 # inta
-var_name = 'vgos' # str
+urcrnrlon = 260 # inta
+var_name = 'adt' # str
 r_path = '/home/caelus/dock_2/psi36/DATA/ncfile/CDS/nc/'# str
-w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_0_42_110_140_M.nc'
-w_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_0_42_110_140_D.nc'
+w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_10_70_112_260_M.nc'
+w_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_10_70_112_260_D.nc'
 
 dir_list = os.listdir(r_path)
 nc_list = np.sort([file for file in dir_list if file.endswith(".nc")])
