@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 25 12:12:06 2020
+Created on Wed Jun 16 16:51:32 2021
 
-@author: shamu
+@author: caelus
 """
+
 
 import os
 import numpy as np
@@ -14,14 +15,14 @@ from netCDF4 import Dataset
 from tqdm import tqdm
 
 # Difine variables
-llcrnrlat = 23 # int  
-urcrnrlat = 24 # int
-llcrnrlon = 125 # int
-urcrnrlon = 180 # inta
+llcrnrlat = 0 # int  
+urcrnrlat = 60 # int
+llcrnrlon = 112 # int
+urcrnrlon = 260 # inta
 var_name = 'adt' # str
-r_path = '/home/caelus/dock_2/psi36/DATA/ncfile/GRSST/nc_files/Monthly/'
-# w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_10_70_112_260_M.nc'
-# w_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_10_70_112_260_D.nc'
+r_path = '/home/caelus/dock_2/psi36/DATA/ncfile/CDS/nc/'# str
+w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+\
+    '_'+str(llcrnrlat)+'_'+str(urcrnrlat)+'_'+str(llcrnrlon)+'_'+str(urcrnrlon)+'_M.nc'
 
 dir_list = os.listdir(r_path)
 nc_list = np.sort([file for file in dir_list if file.endswith(".nc")])
@@ -49,12 +50,12 @@ Data[Data<-10] = np.nan
 
 ds = xr.Dataset(
     {
-        var_name: (["time","y", "x"], Data)#,
+        var_name: (["time","lat", "lon"], Data)#,
         # "mask": (["y","x"],mask)
     },
     coords={
-        "lon": (["x"], lon_rgnl),
-        "lat": (["y"], lat_rgnl),
+        "lon": lon_rgnl,
+        "lat": lat_rgnl,
         "time": pd.date_range("1993-01-01", periods=Data.shape[0]),
         # "reference_time": pd.Timestamp("2014-09-05"),
     },
@@ -64,13 +65,13 @@ ds = xr.Dataset(
 
 Data_Mmean = ds[var_name].resample(time="1MS").mean(dim="time")
 
-Data_Mmean['lon'] = (["x"], lon_rgnl)
-Data_Mmean['lat'] = (["y"], lat_rgnl)
+# Data_Mmean['lon'] = (["x"], lon_rgnl)
+# Data_Mmean['lat'] = (["y"], lat_rgnl)
 # Data_Mmean['mask'] = (["y","x"],mask)
 
 Data_Mmean.to_netcdf(path=w_path1,mode='w')
 
-ds.to_netcdf(path=w_path2,mode='w')
+# ds.to_netcdf(path=w_path2,mode='w')
 
 # =============================================================================
 # Second method ==> slower 

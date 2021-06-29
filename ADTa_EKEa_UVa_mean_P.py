@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jun 29 13:57:54 2021
+Created on Wed Jun 23 18:49:07 2021
 
 @author: caelus
 """
+
 
 
 PKG_path = '/home/caelus/dock_1/Working_hub/LGnDC_dep/python_cent/MantaPKG/'
@@ -29,24 +30,6 @@ Sig_set['dates'] = pd.to_datetime(Sig_set.index).strftime('%Y-%m')
 minlon,maxlon = 112,180
 minlat,maxlat = 5,30
 
-# data_a_6M = data_a_6M.mean(dim='latitude')
-def MantaCurl2D(u,v,dx=28400.0,dy=28400.0 ):
-    import numpy as np
-    '''
-    dx = 28400.0 # meters calculated from the 0.25 degree spatial gridding 
-    dy = 28400.0 # meters calculated from the 0.25 degree spatial gridding 
-    '''
-    u_T = u.transpose([1,0])
-    v_T = v.transpose([1,0])
-
-    
-    du_dx, du_dy = np.gradient(u_T, dx,dy)
-    dv_dx, dv_dy = np.gradient(v_T, dx,dy)
-
-    curl = dv_dx - du_dy
-    return curl.transpose([1,0])
-
-
 KVTe = Sig_set.KVTe_index_2Y_Rm
 
 ADT_t = xr.open_dataset('/home/caelus/dock_1/Working_hub/DATA_dep/CDS/T_CDS_monthly_199301_201912.nc',decode_times=True)
@@ -55,83 +38,39 @@ ADT_t = ADT_t.drop(['crs','lat_bnds','lon_bnds','err','sla','ugosa','vgosa'])
 
 ADT_t = ADT_t.loc[dict(latitude=slice(minlat,maxlat),longitude=slice(minlon,maxlon),nv= 1 )]
 
-# Calculating Vorticity (Curl) 
-
-tmp_ugos = ADT_t.ugos.values
-tmp_vgos = ADT_t.vgos.values
-
-t,at,on = tmp_ugos.shape
-Curl = np.zeros_like(tmp_ugos)
-for i in range(t):
-    Curl[i,:,:] = MantaCurl2D(tmp_ugos[i,:,:],tmp_vgos[i,:,:])
-
-CURL = xr.Dataset(
-    {
-        'curl': (["time","latitude", "longitude"], Curl)#,
-        # "mask": (["y","x"],mask)
-    },
-    coords={
-        "longitude": (["longitude"], ADT_t.longitude),
-        "latitude": (["latitude"], ADT_t.latitude),
-        "time": (['time'], ADT_t.time),
-        # "reference_time": pd.Timestamp("2014-09-05"),
-    },)
-
-
-# Calculating EKE
-ADT_t['EKE'] = (ADT_t.ugos*2 + ADT_t.vgos*2)/2
-
-# Merge data
-ADT_t = xr.merge([ADT_t,CURL])
-
-# Data 2 anomaly
-ADT_t = ADT_t - ADT_t.mean(dim='time')
-
 # ------Masking (Extension) --------
-import copy 
+
 mask_mlon,mask_Mlon = 130,190
 mask_mlat,mask_Mlat = 30, 40
 
-tmp_data = copy.deepcopy(ADT_t)
+tmp_data = ADT_t.adt 
 
-tmp_data = tmp_data.where( (tmp_data.longitude<mask_mlon) | (tmp_data.longitude>mask_Mlon) |\
-              (tmp_data.latitude<mask_mlat) | (tmp_data.latitude>mask_Mlat),drop=False)
+ADT_t =ADT_t.where( (ADT_t.longitude<mask_mlon) | (ADT_t.longitude>mask_Mlon) |\
+              (ADT_t.latitude<mask_mlat) | (ADT_t.latitude>mask_Mlat),drop=False)
 
-tmp_data.drop(['EKE','adt','Curl'])
-ADT_.drop(['ugos','vgos'])
+ADT_t = ADT_t.drop('adt')
 
 ADT_t = xr.merge([tmp_data,ADT_t])
 # --------------
 
-Time=[['1994-12','1999-01'],['2003-01','2005-03'],['2006-12','2009-07']]
 
-# Time_p1 = ['1994-12','1999-01']
-# Time_p2 = ['2003-01','2005-03']
-# Time_p3 = ['2006-12','2009-07']
+ADT_t['EKE'] = (ADT_t.ugos*2 + ADT_t.vgos*2)/2
 
-for t in Time:
-    PN_data = ADT_t.loc[dict(time=slice(t[0],t[1]))]
-    PN_data = PN_data.mean(dim='time')
-
-# P1_data = ADT_t.loc[dict(time=slice(Time_p1[0],Time_p1[1]))]
-# P2_data = ADT_t.loc[dict(time=slice(Time_p2[0],Time_p2[1]))]
-# P3_data = ADT_t.loc[dict(time=slice(Time_p3[0],Time_p3[1]))]
-
-# P1 = P1_data.mean(dim='time')
-# P2 = P2_data.mean(dim='time')
-# P3 = P3_data.mean(dim='time')
+ADT_t = ADT_t - ADT_t.mean(dim='time')
 
 
 
+Time_p1 = ['1994-12','1999-01']
+Time_p2 = ['2003-01','2005-03']
+Time_p3 = ['2006-12','2009-07']
 
-# =============================================================================
-# =============================================================================
-# =============================================================================
-# # # 
-# =============================================================================
-# =============================================================================
-# =============================================================================
+P1_data = ADT_t.loc[dict(time=slice(Time_p1[0],Time_p1[1]))]
+P2_data = ADT_t.loc[dict(time=slice(Time_p2[0],Time_p2[1]))]
+P3_data = ADT_t.loc[dict(time=slice(Time_p3[0],Time_p3[1]))]
 
+P1 = P1_data.mean(dim='time')
+P2 = P2_data.mean(dim='time')
+P3 = P3_data.mean(dim='time')
 
 
 # ------------- 

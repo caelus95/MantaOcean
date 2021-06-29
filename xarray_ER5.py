@@ -109,7 +109,7 @@ np.save(tmp_path+'v10_s',tmp_data2)
 np.save(tmp_path+'lat',tmp_data3)
 np.save(tmp_path+'lon',tmp_data4)
 
-curlZ_s = np.load('/home/caelus/dock_1/Working_hub/DATA_dep/tmp/curlZ_s.npy') 
+curlZ_M = np.load('/home/caelus/dock_1/Working_hub/DATA_dep/tmp/curlZ_s.npy') 
 
 
 # =============================================================================
@@ -117,7 +117,7 @@ curlZ_s = np.load('/home/caelus/dock_1/Working_hub/DATA_dep/tmp/curlZ_s.npy')
 # =============================================================================
 
 figdata01 = np.flipud(data_M.msl.values)/100 # Pa --> hpa
-figdata02 = np.flipud(curlZ_M)
+figdata02 = np.flipud(np.mean(curlZ_M,axis=0))
 lon_00 = data_M.longitude.values  
 lat_00 = np.flipud(data_M.latitude.values)
 
@@ -126,7 +126,7 @@ max_figdata02, min_figdata02 = np.nanmax(figdata02), np.nanmin(figdata02)
 
 # --------------------------figure-------------------------------------
 
-w_path01 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/task_ERA5/'
+# w_path01 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/task_ERA5/'
 
 
 fig, ax = plt.subplots(figsize=(15,8),linewidth=1)
@@ -163,7 +163,7 @@ cax.set_ylabel('',{'fontsize':20,'fontweight':'bold','style':'italic'})
 #label 
 h = plt.colorbar(label='',cax=cax);
 h = plt.colorbar(label='$\mathit{10^{-7} N \cdot m^{-3}}$',cax=cax);
-plt.savefig(w_path01+'Climatology_WSC_Press',bbox_inches='tight')
+# plt.savefig(w_path01+'Climatology_WSC_Press',bbox_inches='tight')
 plt.tight_layout()
 plt.show()
 

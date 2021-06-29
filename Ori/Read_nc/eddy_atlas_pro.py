@@ -1,69 +1,53 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Nov 26 18:58:53 2020
+Created on Sat Jun 12 13:54:45 2021
 
 @author: shamu
 """
 
-
 from netCDF4 import Dataset
-r_path ='/home/caelus/dock_1/Working_hub/DATA_dep/MesoscaleEddy/eddy_trajectory_2.0exp_19930101_20191015.nc'
-A = Dataset(r_path)
-
-
 import xarray as xr
 import numpy as np
-# Load dataset with xarray
-# r_path = '/home/caelus/dock_1/psi36/DATA/ncfile/MesoscaleEddy/eddy_trajectory_2.0exp_19930101_20191015.nc'
+from matplotlib import dates
+import datetime as dt
+
+r_path ='/home/caelus/tmp/eddy_atlas/eddy_trajectory_2.0exp_19930101_20191015.nc'
+A = Dataset(r_path)
+A = xr.open_dataset(r_path,decode_times=False) 
+
+# =============================================================================
+# Dates correction
+# =============================================================================
+Dstrt, Dend = '1993-01-01', '1995-12'
+
+Dstrt_n = dates.datestr2num(Dstrt)
+Dend_n = dates.datestr2num(Dend)
+
+ref_date = '1950-01-01'
+ref_n = dates.datestr2num(ref_date)
+
+data_date_str = dates.num2date(ref_n+A.time[0].values).strftime('%Y-%m')
+print('Ref date of data : '+ref_date)
+print('Data starts at : '+data_date_str)
+print('Correction values : '+str(-ref_n))
+
+Dstrt_c, Dend_c = Dstrt_n - ref_n, Dend_n - ref_n
+
+# =============================================================================
+#     
+# =============================================================================
+w_path1 = '/home/caelus/tmp/eddy_atlas/outputs/'
 with xr.open_dataset(r_path, decode_cf=False)  as h:
  
-    lon_min, lon_max, lat_min, lat_max =1,5, -28, -27
-    t =25150# Select a specific eddy with date and area, only some observations
-    subset = h.sel(obs=(h.longitude> lon_min) & (h.longitude< lon_max) & (h.latitude> lat_min) & (h.latitude< lat_max) & (h.time==25147))# Extract full track
+    lon_min, lon_max, lat_min, lat_max =112,140, 17, 30
+    # t =25150# Select a specific eddy with date and area, only some observations
+    subset = h.sel(obs=(h.longitude> lon_min) & (h.longitude< lon_max) &
+                   (h.latitude> lat_min) & (h.latitude< lat_max) &
+                   (h.time >= Dstrt_c)&(h.time<=Dend_c))# Extract full track
     subset = h.isel(obs=np.in1d(h.track, subset.track))# Store selected dataprint(subset)
-    subset.to_netcdf('output_eddy.nc')
+    subset.to_netcdf(w_path1+'test_output.nc')
     
-    
-    
-from matplotlib import pyplot as plt
-# Load dataset with xarray
-ax = plt.subplot(111) 
-with xr.open_dataset('output_eddy.nc')as h:
-    N =20# plot contour every N
-    ax.plot((h.speed_contour_longitude[::N].T + 180) % 360 - 180, h.speed_contour_latitude[::N].T,'r')# plot path
-    ax.plot((h.longitude + 180) % 360 - 180, h.latitude,'b', label='eddy path')
-    ax.set_aspect('equal')
-    ax.legend()
-    ax.grid()
-plt.show()
- 
-
-
-
-import xarray as xr
-import numpy as np
-# Load dataset with xarray
-# r_path = '/home/shamu/mangrove2/psi36/DATA/ncfile/MesoscaleEddy/eddy_trajectory_2.0exp_19930101_20191015.nc'
-Data = xr.open_dataset(r_path, decode_cf=False)
-
-
-
-import datetime as dt
-from matplotlib.dates import date2num,num2date,datestr2num
-
-Data.time.data
-
-num2date(15706+datestr2num('1950-01-01')) # 1993-01-01 
-
-
-lon_min, lon_max, lat_min, lat_max =1,5, -28, -27
-t =25150# Select a specific eddy with date and area, only some observations
-subset = h.sel(obs=(h.longitude> lon_min) & (h.longitude< lon_max) & (h.latitude> lat_min) & (h.latitude< lat_max) & (h.time==25147))# Extract full track
-subset = h.isel(obs=np.in1d(h.track, subset.track))# Store selected dataprint(subset)
-subset.to_netcdf('output_eddy.nc')
-
-
 
 # =============================================================================
 # Finding eddies at longitude-latitude-box 
@@ -92,7 +76,20 @@ eddy_lat.where((eddy_lat>Mlat)&(eddy_lat<mlat))
 # =============================================================================
 
 
+import os
+os.chdir('/home/shamu/HUB/')
+import xarray as xr
+import numpy as np
+# Load dataset with xarray
+r_path ='/home/shamu/HUB/eddy_trajectory_2.0exp_19930101_20191015.nc'
+with xr.open_dataset(r_path, decode_cf=False)  as h:
 
+    lon_min, lon_max, lat_min, lat_max =120,140, 10,20
+    t_min,t_max = 15706,18261 # Select a specific eddy with date and area, only some observations
+    subset = h.sel(obs=(h.longitude > lon_min) & (h.longitude < lon_max) &
+                   (h.latitude> lat_min) & (h.latitude< lat_max) & (h.time>=t_min) & (h.time<=t_max))# Extract full track
+    # subset = h.isel(obs=np.in1d(h.track, subset.track))# Store selected dataprint(subset) (slicing)
+    subset
     
     
 

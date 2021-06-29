@@ -9,7 +9,7 @@ Created on Mon May 10 15:26:48 2021
 # r_path = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/ALL/analysis_sigs/'
 
 
-def sig_pro(r_path,ref_time,Standard=True,WY=2):
+def sig_pro(r_path,ref_time,method='Standard',WY=2):
     '''
     r_path1 : str
     ref_time : list ex) ['1993-01-01',324,300]
@@ -42,14 +42,6 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
     # Sig_sets.rename(columns={'EKE_qiu_10_30_120_250':'EKE_qiu','EKE_qiu_10_30_120_250_ceemd_imf5':'EKE_qiu_ceemd_imf5',
     #                      'EKE_qiu_10_30_120_250_pc1':'EKE_qiu_pc1'},inplace=True)  
     
-    if Standard :
-        Sig_sets = (Sig_sets -Sig_sets.mean())/(Sig_sets.std())
-
-
-    # Annual mean 
-    Sig_sets['dates'] = pd.to_datetime(Sig_sets.index)
-    Annual_mean = Sig_sets.groupby(Sig_sets.dates.dt.year).mean()
-
     # Creating RM (Dataframe)
     RM = Sig_sets.rolling(window=int(12*WY),center=True).mean()
     
@@ -69,9 +61,19 @@ def sig_pro(r_path,ref_time,Standard=True,WY=2):
 
     print('!!!!!!!!!!!!!!!!!!!\nCorrcoef --> 1994~\n!!!!!!!!!!!!!!!!!!!')
     
+    if method == 'Standard':
+        Sig_sets = (Sig_sets -Sig_sets.mean())/(Sig_sets.std())
+    elif method == 'Normal':
+        Sig_sets = (Sig_sets -Sig_sets.min())/(Sig_sets.max() - Sig_sets.min())
+    elif method == 'STDNorm':
+        Sig_sets = (Sig_sets -Sig_sets.mean())/(Sig_sets.std())
+        Sig_sets = (Sig_sets -Sig_sets.min())/(Sig_sets.max() - Sig_sets.min())
 
+    Sig_sets['dates'] = pd.to_datetime(Sig_sets.index)
 
-    
+    # Annual mean 
+    Annual_mean = Sig_sets.groupby(Sig_sets.dates.dt.year).mean()
+
     
     return Sig_sets, Corr_Matrix, Annual_mean
     

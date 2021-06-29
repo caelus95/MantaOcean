@@ -14,29 +14,18 @@ from netCDF4 import Dataset
 from tqdm import tqdm
 
 # Difine variables
-llcrnrlat = 23 # int  
-urcrnrlat = 24 # int
-llcrnrlon = 125 # int
-urcrnrlon = 180 # inta
 var_name = 'adt' # str
-r_path = '/home/caelus/dock_2/psi36/DATA/ncfile/GRSST/nc_files/Monthly/'
-# w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_10_70_112_260_M.nc'
-# w_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_10_70_112_260_D.nc'
+r_path = '/home/caelus/dock_2/psi36/DATA/ncfile/CDS/nc/'# str
+w_path1 = '/home/caelus/dock_1/Working_hub/DATA_dep/Kuroshio/'+var_name+'_10_70_112_260_M.nc'
 
 dir_list = os.listdir(r_path)
 nc_list = np.sort([file for file in dir_list if file.endswith(".nc")])
 
-dataset = Dataset(r_path+nc_list[0])
+tmp_dataset = xr.open_dataset(r_path+nc_list[0])
+for i in nc_list[1:]:
+    tmp
 
-ELat = dataset.variables['latitude'][:]
-ELon = dataset.variables['longitude'][:]
 
-lat_co = np.where((ELat >= llcrnrlat) & (ELat <= urcrnrlat))[0]
-lon_co = np.where((ELon >= llcrnrlon) & (ELon <= urcrnrlon))[0]
-mask = dataset.variables[var_name][0, lat_co, lon_co].mask
-
-lat_rgnl = ELat[lat_co]
-lon_rgnl = ELon[lon_co]
 
 Data,n = np.zeros((len(nc_list), len(lat_co), len(lon_co))),0
 for i in tqdm(nc_list):
@@ -49,12 +38,12 @@ Data[Data<-10] = np.nan
 
 ds = xr.Dataset(
     {
-        var_name: (["time","y", "x"], Data)#,
+        var_name: (["time","lat", "lon"], Data)#,
         # "mask": (["y","x"],mask)
     },
     coords={
-        "lon": (["x"], lon_rgnl),
-        "lat": (["y"], lat_rgnl),
+        "lon": lon_rgnl,
+        "lat": lat_rgnl,
         "time": pd.date_range("1993-01-01", periods=Data.shape[0]),
         # "reference_time": pd.Timestamp("2014-09-05"),
     },
@@ -64,13 +53,13 @@ ds = xr.Dataset(
 
 Data_Mmean = ds[var_name].resample(time="1MS").mean(dim="time")
 
-Data_Mmean['lon'] = (["x"], lon_rgnl)
-Data_Mmean['lat'] = (["y"], lat_rgnl)
+# Data_Mmean['lon'] = (["x"], lon_rgnl)
+# Data_Mmean['lat'] = (["y"], lat_rgnl)
 # Data_Mmean['mask'] = (["y","x"],mask)
 
 Data_Mmean.to_netcdf(path=w_path1,mode='w')
 
-ds.to_netcdf(path=w_path2,mode='w')
+# ds.to_netcdf(path=w_path2,mode='w')
 
 # =============================================================================
 # Second method ==> slower 

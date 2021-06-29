@@ -44,7 +44,7 @@ r_path2 = '/home/caelus/dock_1/Working_hub/DATA_dep/ERA5/'
 
 Time = ['1993-01','2019-12'] 
 minlon,maxlon = 112,160
-minlat,maxlat = 5,45,
+minlat,maxlat = 5,45
     
 
 Sample_Data1 = xr.open_dataset(r_path2+'ERA5_landSea_mask.nc')

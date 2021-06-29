@@ -234,6 +234,7 @@ while n < 312:
                     dashes=[2,2],fontsize=22,fontweight='bold',color='grey')
     m.drawmeridians(np.arange(-180.,181.,20.),labels=[False,False,False,True],
                     dashes=[2,2],fontsize=22,fontweight='bold',color='grey')
+    m.arcgisimage(service='ESRI_Imagery_World_2D'. xpixels=1500,verbose=True)
     plt.title('a) Date : '+Sig_set.dates[n] + ' (ADTa & UVa 2Y filtered)', fontproperties='',loc='left',pad=15,fontsize=28,fontweight='regular')
     #plt.suptitle(' UV (mean flow) & speed (anomaly) ',fontstyle='italic',position=(0.5, .92),fontsize=20)
     # cs1 = m.contour(lon_m11,lat_m11,np.flipud(figdata111[n,:,:]),colors='grey',linewidths=2.5,levels=10)
